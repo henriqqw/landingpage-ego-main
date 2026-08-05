@@ -1,7 +1,7 @@
 # Landing Page — Ego Criativo
 
 Landing page institucional da **Ego Criativo**, agência de publicidade, tecnologia e eventos.
-Site estático em **Astro + Tailwind v4**, com deploy contínuo na **Cloudflare Pages**.
+Site estático em **Astro + Tailwind v4**, com deploy contínuo na Vercel
 
 > Site de produção: [egocriativo.com.br](https://egocriativo.com.br)
 
@@ -15,7 +15,7 @@ Site estático em **Astro + Tailwind v4**, com deploy contínuo na **Cloudflare 
 | Scroll | [Lenis](https://github.com/darkroomengineering/lenis) |
 | SEO | `@astrojs/sitemap`, Open Graph, JSON-LD (Organization) |
 | Analytics | Umami Cloud (cookieless — sem banner de cookies) |
-| Hospedagem | Cloudflare Pages (CDN global, HTTPS) |
+| Hospedagem | Vercel |
 
 ## Estrutura
 
@@ -65,10 +65,6 @@ npm run build      # gera dist/
 npm run preview    # serve o build local
 ```
 
-## Deploy
-
-Push na `main` → build automático na Cloudflare Pages (`astro build` → `dist/`).
-Pull requests geram preview deploys.
 
 ## Contexto do projeto
 
