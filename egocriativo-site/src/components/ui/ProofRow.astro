@@ -1,0 +1,75 @@
+---
+// Linha de ficha: rótulo (mono) · valor · verificação. A unidade atômica do registro documental.
+interface Props {
+  rotulo: string;
+  valor: string;
+  url?: string;
+}
+const { rotulo, valor, url } = Astro.props;
+---
+<div class="row rule-doc">
+  <span class="rotulo mono-label">{rotulo}</span>
+  <span class="valor tabnum">{valor}</span>
+  {
+    url ? (
+      <a
+        class="verificar"
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-track="proof_click"
+        data-track-id={rotulo}
+      >
+        VERIFICAR ↗
+      </a>
+    ) : (
+      <span />
+    )
+  }
+</div>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: max-content 1fr max-content;
+    align-items: baseline;
+    gap: 0.5rem 1.25rem;
+    padding: 0.75rem 0;
+    transition: background-color 0.16s ease;
+  }
+  .row:last-child {
+    border-bottom: 0;
+  }
+  .rotulo {
+    white-space: nowrap;
+  }
+  .valor {
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    color: var(--color-ink);
+  }
+  .verificar {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    color: var(--color-dim);
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+    transition: color 0.16s ease;
+  }
+  .row:hover .verificar,
+  .verificar:hover {
+    color: var(--color-amber);
+    text-decoration-style: solid;
+  }
+
+  @media (max-width: 560px) {
+    .row {
+      grid-template-columns: 1fr max-content;
+    }
+    .rotulo {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

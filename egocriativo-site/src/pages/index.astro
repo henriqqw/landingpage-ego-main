@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import Hero from '../components/sections/Hero.astro';
+import Pains from '../components/sections/Pains.astro';
+import Bridge from '../components/sections/Bridge.astro';
+import Trajetoria from '../components/sections/Trajetoria.astro';
+import Method from '../components/sections/Method.astro';
+import Services from '../components/sections/Services.astro';
+import Founder from '../components/sections/Founder.astro';
+import Offer from '../components/sections/Offer.astro';
+import Faq from '../components/sections/Faq.astro';
+import FinalCta from '../components/sections/FinalCta.astro';
+import WhatsappFab from '../components/ui/WhatsappFab.astro';
+---
+{/* Funil: dor → causa → o que já foi entregue → como funciona → o que exatamente →
+    quem é você → pedido → objeções → última chamada.
+    A história da marca sobe para a 4ª posição: pedir crédito antes de mostrar garantia
+    é o que fazia o visitante atravessar três seções de alegação sem ver uma evidência. */}
+<BaseLayout>
+  <Header />
+  <main>
+    <Hero />
+    <Pains />
+    <Bridge />
+    <Trajetoria />
+    <Method />
+    <Services />
+    <Founder />
+    <Offer />
+    <Faq />
+    <FinalCta />
+  </main>
+  <Footer />
+  <WhatsappFab />
+</BaseLayout>

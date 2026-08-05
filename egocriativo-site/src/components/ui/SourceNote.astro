@@ -1,0 +1,38 @@
+---
+// Nota de fonte. É o elemento mais persuasivo da página: ninguém que está
+// inventando um dado escreve de onde ele veio.
+interface Props {
+  class?: string;
+}
+const { class: klass = '' } = Astro.props;
+---
+<p class:list={['src-note mono-label', klass]}>
+  <span class="tick" aria-hidden="true"></span>
+  <slot />
+</p>
+
+<style>
+  .src-note {
+    display: flex;
+    align-items: baseline;
+    gap: 0.625rem;
+  }
+  .tick {
+    display: inline-block;
+    flex: none;
+    width: 24px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.22);
+    transform: translateY(-0.3em);
+  }
+  .src-note :global(a) {
+    color: var(--color-muted);
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+  }
+  .src-note :global(a:hover) {
+    color: var(--color-amber);
+    text-decoration-style: solid;
+  }
+</style>

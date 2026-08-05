@@ -1,0 +1,221 @@
+---
+// Não é fila de cards: é uma régua. Evento pontual vira ponto; período vira barra —
+// a forma distingue os dois, que é o que uma timeline de verdade faz.
+// Zero JS: a entrada usa o .reveal que já existe, com atraso incremental.
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import SourceNote from '../ui/SourceNote.astro';
+import { marcos, consultaCnpj } from '../../content/prova';
+
+const inicio = 2010;
+const fim = 2026;
+const total = fim - inicio;
+const pct = (ano: number) => ((ano - inicio) / total) * 100;
+const anosRegua = Array.from({ length: total + 1 }, (_, i) => inicio + i);
+const comMarco = new Set(marcos.map((m) => m.ano));
+
+// Só os dois primeiros abertos: a régua acima já dá a dimensão dos 16 anos,
+// e a lista inteira empurrava o resto da página para longe demais no mobile.
+const visiveis = marcos.slice(0, 2);
+const resto = marcos.slice(2);
+---
+<section id="historia" class="py-[clamp(4rem,10vw,8rem)]" data-section="trajetoria">
+  <Container>
+    <SectionHeading
+      eyebrow="A história da marca"
+      title='De 2010 até hoje, <span class="text-gradient">com data em cada marco</span>'
+      subtitle="Dezesseis anos não são um número redondo de campanha: são uma régua que dá para percorrer ano a ano — com o nome e o promotor de cada entrega."
+    />
+
+    <!-- Régua: os anos, com tick maior onde houve marco -->
+    <div class="regua reveal" aria-hidden="true">
+      <div class="trilho"></div>
+      {
+        anosRegua.map((a) => (
+          <span
+            class:list={['tick', { forte: comMarco.has(a) }]}
+            style={`left:${pct(a)}%`}
+          />
+        ))
+      }
+      {
+        [2010, 2015, 2020, 2025].map((a) => (
+          <span class="rotulo mono-label tabnum" style={`left:${pct(a)}%`}>
+            {a}
+          </span>
+        ))
+      }
+      {
+        marcos
+          .filter((m) => m.ate)
+          .map((m) => (
+            <span
+              class="periodo"
+              style={`left:${pct(m.ano)}%;width:${pct(m.ate!) - pct(m.ano)}%`}
+            />
+          ))
+      }
+    </div>
+
+    <ol class="marcos">
+      {
+        visiveis.map((m, i) => (
+          <li class:list={['marco reveal', { ancora: m.ancora }]} style={`--reveal-delay:${i * 50}ms`}>
+            <time class="ano tabnum" datetime={String(m.ano)}>
+              {m.ano}
+              {m.ate && <span class="ate">–{m.ate}</span>}
+            </time>
+            <div class:list={['conteudo glass-card', { 'glass-card--warm': m.ancora }]}>
+              <h3 class="titulo">{m.titulo}</h3>
+              <p class="desc">{m.desc}</p>
+              <p class="entidade mono-label">{m.entidade}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <details class="mais reveal">
+      <summary class="mono-label glass-card btn-mais">
+        <span class="abrir">+ ver mais</span>
+        <span class="fechar">− recolher</span>
+      </summary>
+      <ol class="marcos mt-6" start={visiveis.length + 1}>
+        {
+          resto.map((m) => (
+            <li class:list={['marco', { ancora: m.ancora }]}>
+              <time class="ano tabnum" datetime={String(m.ano)}>
+                {m.ano}
+                {m.ate && <span class="ate">–{m.ate}</span>}
+              </time>
+              <div class:list={['conteudo glass-card', { 'glass-card--warm': m.ancora }]}>
+                <h3 class="titulo">{m.titulo}</h3>
+                <p class="desc">{m.desc}</p>
+                <p class="entidade mono-label">{m.entidade}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </details>
+
+    <SourceNote class="reveal mt-8">
+      Data de constituição e situação cadastral:
+      <a href={consultaCnpj} target="_blank" rel="noopener noreferrer" data-track="proof_click" data-track-id="timeline-cnpj">
+        Receita Federal ↗
+      </a>
+      · Eventos: registro datado, com nome oficial e entidade promotora em cada linha
+    </SourceNote>
+  </Container>
+</section>
+
+<style>
+  .regua {
+    position: relative;
+    height: 46px;
+    margin: 3.5rem 0 3rem;
+  }
+  .trilho {
+    position: absolute;
+    top: 14px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.14);
+  }
+  .tick {
+    position: absolute;
+    top: 8px;
+    width: 1px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+  .tick.forte {
+    top: 4px;
+    height: 14px;
+    background: var(--color-amber);
+  }
+  .rotulo {
+    position: absolute;
+    top: 24px;
+    transform: translateX(-50%);
+  }
+  /* Período: barra sobre o trilho. Um intervalo não é um ponto. */
+  .periodo {
+    position: absolute;
+    top: 13px;
+    height: 3px;
+    background: rgba(240, 116, 42, 0.55);
+    border-radius: 2px;
+  }
+
+  .marcos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  @media (min-width: 768px) {
+    .marcos {
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+  }
+  .marco {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    align-items: start;
+    gap: 1rem;
+    padding: 0.75rem 0;
+  }
+  .ano {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    line-height: 1.1;
+    color: var(--color-amber);
+  }
+  .ate {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--color-dim);
+  }
+  .conteudo {
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-doc);
+  }
+  .titulo {
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--color-ink);
+  }
+  .desc {
+    margin-top: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-muted);
+  }
+  .entidade {
+    margin-top: 0.625rem;
+  }
+
+  .mais {
+    margin-top: 1.5rem;
+  }
+  /* Geometria vem de .btn-mais; aqui só a cor da seção escura. */
+  .mais summary {
+    color: var(--color-ink);
+  }
+  .mais summary:hover {
+    color: var(--color-amber);
+  }
+  .mais .fechar,
+  .mais[open] .abrir {
+    display: none;
+  }
+  .mais[open] .fechar {
+    display: inline;
+  }
+</style>

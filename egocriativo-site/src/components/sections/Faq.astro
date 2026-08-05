@@ -1,0 +1,132 @@
+---
+// Linhas, não cards: a seção mais arejada da página, servindo de respiro antes do fecho.
+// As perguntas passaram a ser as objeções reais de quem já se queimou com agência —
+// preço primeiro, porque é a que trava a leitura de todo o resto.
+import Container from '../ui/Container.astro';
+import Icon from '../ui/Icon.astro';
+import { faq } from '../../content/copy';
+import { waLink } from '../../content/site';
+---
+<section class="secao" data-section="faq">
+  <Container class="max-w-[820px]">
+    <div class="cabeca">
+      <p class="reveal eyebrow mono-label">Dúvidas</p>
+      <h2 class="reveal titulo">As perguntas que você faria na primeira reunião</h2>
+      <p class="reveal sub">
+        Respondidas aqui para você não precisar marcar uma reunião só para perguntar.
+      </p>
+    </div>
+
+    <div class="lista">
+      {
+        faq.map((f, i) => (
+          <details class="item reveal" data-faq={f.q} style={`--reveal-delay:${i * 40}ms`}>
+            <summary>
+              <span class="pergunta">{f.q}</span>
+              <span class="mais" aria-hidden="true">
+                +
+              </span>
+            </summary>
+            <p class="resposta">{f.a}</p>
+          </details>
+        ))
+      }
+    </div>
+
+    <a
+      href={waLink('Olá! Vim pelo site e fiquei com uma dúvida.')}
+      class="ponte glass-card glass-card--light is-warm reveal"
+      data-track="cta_click"
+      data-track-id="faq-whatsapp"
+    >
+      <span>Ainda com dúvida? Fale direto no WhatsApp</span>
+      <Icon name="arrow" size={18} />
+    </a>
+  </Container>
+</section>
+
+<style>
+  /* Superfície clara — a mesma do Bridge, do Método e do Sobre. */
+  .secao {
+    background: linear-gradient(180deg, #f6f1ea 0%, #ece4d9 100%);
+    color: #1a120c;
+    padding-block: clamp(4rem, 10vw, 8rem);
+  }
+  .cabeca {
+    max-width: 760px;
+    margin-inline: auto;
+    text-align: center;
+  }
+  .eyebrow {
+    color: #a84a12;
+  }
+  .titulo {
+    margin-top: 1rem;
+    font-size: clamp(2rem, 4.6vw, 3rem);
+    line-height: 1.08;
+    color: #160f0a;
+  }
+  .sub {
+    margin-top: 1.25rem;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: #5c4d42;
+  }
+
+  .lista {
+    margin-top: 3rem;
+    border-top: 1px solid rgba(26, 18, 12, 0.14);
+  }
+  .item {
+    border-bottom: 1px solid rgba(26, 18, 12, 0.14);
+  }
+  .item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.25rem 0;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  .item summary:hover .pergunta {
+    color: #a84a12;
+  }
+  .pergunta {
+    font-family: var(--font-display);
+    font-size: clamp(1.125rem, 2.2vw, 1.35rem);
+    line-height: 1.3;
+    color: #160f0a;
+    transition: color 0.2s ease;
+  }
+  .mais {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #c25a15;
+    transition: transform 0.25s ease;
+  }
+  .item[open] .mais {
+    transform: rotate(45deg);
+  }
+  .resposta {
+    padding: 0 0 1.5rem;
+    max-width: 68ch;
+    line-height: 1.7;
+    color: #5c4d42;
+  }
+
+  .ponte {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 1.125rem 1.25rem;
+    border-radius: var(--radius-doc);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #160f0a;
+  }
+</style>

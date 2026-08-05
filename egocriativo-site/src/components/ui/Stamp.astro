@@ -1,0 +1,109 @@
+---
+// Carimbo do cadastro. Não é enfeite: é o único dado da página que qualquer pessoa
+// pode conferir na fonte primária em dois cliques.
+import { consultaCnpj } from '../../content/prova';
+
+interface Props {
+  size?: number;
+  /** Opacidade da tinta (0–1). Menor no rodapé, maior quando é peça de assinatura. */
+  ink?: number;
+  class?: string;
+}
+const { size = 148, ink = 0.62, class: klass = '' } = Astro.props;
+
+const label =
+  'Carimbo: CNPJ 11.648.734/0001-06, situação cadastral ativa desde 8 de março de 2010. Consulta pública na Receita Federal.';
+---
+<a
+  class:list={['stamp-link reveal', klass]}
+  href={consultaCnpj}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label={label}
+  data-track="proof_click"
+  data-track-id="carimbo-cnpj"
+  style={`--ink:${ink}`}
+>
+  <svg
+    class="stamp"
+    width={size}
+    height={size}
+    viewBox="0 0 148 148"
+    fill="none"
+    role="img"
+    aria-hidden="true"
+  >
+    <defs>
+      <!-- Irregularidade da tinta: é o que separa "carimbo" de "vetor". -->
+      <filter id="stamp-ink" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="1.6" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      <path id="stamp-top" d="M13.2,57.7 A63,63 0 0 1 134.8,57.7" />
+      <path id="stamp-bottom" d="M6.9,92 A69.5,69.5 0 0 0 141.1,92" />
+    </defs>
+
+    <g filter="url(#stamp-ink)">
+      <circle cx="74" cy="74" r="71" stroke="currentColor" stroke-width="2" />
+      <circle cx="74" cy="74" r="62" stroke="currentColor" stroke-width="0.8" />
+
+      <text class="arc" fill="currentColor">
+        <textPath href="#stamp-top" startOffset="50%" text-anchor="middle">
+          RECEITA FEDERAL DO BRASIL · CNPJ 11.648.734/0001-06
+        </textPath>
+      </text>
+      <text class="arc" fill="currentColor">
+        <textPath href="#stamp-bottom" startOffset="50%" text-anchor="middle">
+          SITUAÇÃO CADASTRAL ATIVA
+        </textPath>
+      </text>
+
+      <line x1="34" y1="60" x2="114" y2="60" stroke="currentColor" stroke-width="0.8" />
+      <line x1="34" y1="92" x2="114" y2="92" stroke="currentColor" stroke-width="0.8" />
+
+      <text class="data" x="74" y="82" text-anchor="middle" fill="currentColor">08 · 03 · 2010</text>
+      <text class="sub" x="74" y="104" text-anchor="middle" fill="currentColor">
+        AGÊNCIA DE PUBLICIDADE
+      </text>
+    </g>
+  </svg>
+</a>
+
+<style>
+  .stamp-link {
+    display: inline-block;
+    line-height: 0;
+    color: var(--color-orange);
+    /* O carimbo "vaza" no fundo em vez de flutuar sobre ele. */
+    mix-blend-mode: screen;
+    opacity: var(--ink);
+  }
+  .stamp-link:hover {
+    opacity: 1;
+  }
+  .stamp {
+    transform: rotate(-9deg) scale(1.14);
+    transition:
+      transform 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.34s ease;
+  }
+  /* Assenta como um carimbo batendo no papel, uma única vez, quando entra em cena. */
+  .stamp-link.in .stamp {
+    transform: rotate(-7deg) scale(1);
+  }
+  .arc {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.18em;
+  }
+  .data {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 0.02em;
+  }
+  .sub {
+    font-family: var(--font-mono);
+    font-size: 7px;
+    letter-spacing: 0.14em;
+  }
+</style>

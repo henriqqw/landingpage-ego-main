@@ -1,0 +1,188 @@
+---
+import { site } from '../../content/site';
+import { institutions } from '../../content/copy';
+import Container from '../ui/Container.astro';
+import Icon from '../ui/Icon.astro';
+import Marquee from '../ui/Marquee.astro';
+import ProxWord from '../ui/ProxWord.astro';
+---
+{/* Altura acompanha o conteúdo (com um piso para telas baixas) em vez de 100vh:
+    assim o fundo termina logo depois do marquee, sem sobra de imagem embaixo. */}
+<section id="top" class="relative isolate flex min-h-[40rem] items-center overflow-hidden">
+  <!-- Fundo: PLACEHOLDER (site.heroBg). TODO: trocar por imagem própria/licenciada da marca. -->
+  <div
+    id="hero-bg"
+    class="absolute inset-0 -z-20 scale-110 bg-cover bg-center blur-[6px]"
+    style={`background-image:url('${site.heroBg}')`}
+    aria-hidden="true"
+  >
+  </div>
+  <div
+    class="absolute inset-0 -z-10 bg-gradient-to-r from-black/60 via-black/20 to-transparent"
+    aria-hidden="true"
+  >
+  </div>
+
+  <!-- Starfield minimal (estrelas com parallax) — preenchido via script -->
+  <div class="stars pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+    <div class="star-layer" data-count="190" data-size="1.4" data-dur="90" style="opacity:.8">
+      <span class="star-dot"></span><span class="star-dot star-dot--2"></span>
+    </div>
+    <div class="star-layer" data-count="120" data-size="1.8" data-dur="120" style="opacity:.72">
+      <span class="star-dot"></span><span class="star-dot star-dot--2"></span>
+    </div>
+    <div class="star-layer" data-count="60" data-size="2.4" data-dur="160" style="opacity:.85">
+      <span class="star-dot"></span><span class="star-dot star-dot--2"></span>
+    </div>
+  </div>
+
+  <!-- Fade de baixo: dissolve o hero (arco) na cor da próxima seção — sem linha rígida -->
+  <div
+    class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-b from-transparent via-bg/70 to-bg"
+    aria-hidden="true"
+  >
+  </div>
+
+  <Container class="hero-content mx-auto max-w-[880px] pt-36 pb-14 text-center">
+    <div
+      class="reveal mb-6 inline-flex items-center gap-2.5 rounded-full glass py-1.5 pl-2 pr-4 text-sm text-ink/90"
+      style="--reveal-delay:120ms"
+    >
+      <span class="rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-[#161310]">
+        Desde 2010
+      </span>
+      Agência de Publicidade, Tecnologia e Eventos
+    </div>
+
+    <h1
+      id="hero-title"
+      class="reveal text-[clamp(2.8rem,7.4vw,5.6rem)] leading-[1.03]"
+      style="--reveal-delay:220ms"
+      aria-label="Marketing que vira lucro. Não vira despesa."
+    >
+      <ProxWord word="Marketing" />{' '}<ProxWord word="que" />{' '}<ProxWord word="vira" />{' '}<span
+        class="prox highlight">lucro.</span><br /><ProxWord word="Não" />{' '}<ProxWord
+        word="vira"
+      />{' '}<ProxWord word="despesa." />
+    </h1>
+
+    <p class="reveal mx-auto mt-6 max-w-[600px] text-lg text-ink/80" style="--reveal-delay:320ms">
+      <span id="hero-typed" aria-hidden="true"></span><span
+        id="hero-cursor"
+        class="type-cursor"
+        aria-hidden="true">|</span>
+      <span class="sr-only">
+        Há mais de 15 anos transformando ideias viáveis em produtos rentáveis — com estratégia,
+        dados e execução.
+      </span>
+    </p>
+
+    <div
+      class="reveal mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
+      style="--reveal-delay:420ms"
+    >
+      <a
+        href="#contato"
+        class="liquid-border inline-flex items-center gap-2 rounded-full bg-white/10 px-6 py-3.5 text-sm font-semibold text-ink ring-1 ring-white/10 backdrop-blur transition duration-200 [--lm-speed:5s] [--lm-width:1.5px] hover:-translate-y-0.5 hover:bg-white/[0.16]"
+      >
+        Quero meu diagnóstico gratuito <Icon name="arrow" size={18} />
+      </a>
+      <a
+        href={site.contact.whatsapp}
+        class="inline-flex items-center gap-2 rounded-full px-5 py-3.5 text-sm font-semibold text-ink/90 transition duration-200 hover:-translate-y-0.5 hover:text-ink"
+      >
+        <Icon name="phone" size={18} /> Falar no WhatsApp
+      </a>
+    </div>
+
+    <div class="reveal mt-20" style="--reveal-delay:560ms">
+      <p class="mb-6 text-sm text-ink/55">Trajetória reconhecida em projetos com</p>
+      <Marquee items={institutions} speed={30} />
+    </div>
+  </Container>
+</section>
+
+<script>
+  const title = document.getElementById('hero-title');
+  const heroBg = document.getElementById('hero-bg');
+  const heroContent = document.querySelector<HTMLElement>('.hero-content');
+  const starsEl = document.querySelector<HTMLElement>('.stars');
+
+  // --- Estrelas: gera os box-shadows (uma vez) ---
+  const sw = Math.max(window.innerWidth, 1920);
+  document.querySelectorAll<HTMLElement>('.star-layer').forEach((layer) => {
+    const count = Number(layer.dataset.count) || 60;
+    const size = Number(layer.dataset.size) || 1;
+    const dur = Number(layer.dataset.dur) || 100;
+    const shadow = Array.from({ length: count }, () => {
+      const x = Math.floor(Math.random() * sw);
+      const y = Math.floor(Math.random() * 2000);
+      return `${x}px ${y}px #fff`;
+    }).join(', ');
+    layer.style.animationDuration = `${dur}s`;
+    layer.querySelectorAll<HTMLElement>('.star-dot').forEach((dot) => {
+      dot.style.width = `${size}px`;
+      dot.style.height = `${size}px`;
+      dot.style.boxShadow = shadow;
+    });
+  });
+
+  // --- Typewriter no subtítulo ---
+  const typed = document.getElementById('hero-typed');
+  const cursor = document.getElementById('hero-cursor');
+  if (typed) {
+    const full =
+      'Há mais de 15 anos transformando ideias viáveis em produtos rentáveis — com estratégia, dados e execução.';
+    let i = 0;
+    const type = () => {
+      if (i <= full.length) {
+        typed.textContent = full.slice(0, i);
+        i += 1;
+        setTimeout(type, 26);
+      } else if (cursor) {
+        setTimeout(() => (cursor.style.display = 'none'), 1500);
+      }
+    };
+    setTimeout(type, 1000);
+  }
+
+  // --- Mouse (compartilhado: proximidade + parallax das estrelas) ---
+  let mx = -9999;
+  let my = -9999;
+  window.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; }, { passive: true });
+  window.addEventListener('mouseleave', () => { mx = -9999; my = -9999; });
+
+  const letters = title ? Array.from(title.querySelectorAll<HTMLElement>('.prox')) : [];
+  const RADIUS = 130;
+
+  // --- Loop único: proximidade + scroll parallax ---
+  const frame = () => {
+    for (const el of letters) {
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const f = Math.max(0, 1 - Math.hypot(mx - cx, my - cy) / RADIUS);
+      el.style.transform =
+        f > 0 ? `translateY(${(-f * 3).toFixed(2)}px) scale(${(1 + f * 0.16).toFixed(3)})` : '';
+    }
+
+    const sy = window.scrollY;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const p = Math.min(sy / vh, 1);
+
+    if (heroBg) heroBg.style.transform = `translateY(${(sy * 0.08).toFixed(1)}px) scale(1.2)`;
+    if (heroContent) {
+      heroContent.style.transform = `translateY(${(-sy * 0.16).toFixed(1)}px)`;
+      heroContent.style.opacity = `${(1 - p * 0.85).toFixed(3)}`;
+    }
+    if (starsEl) {
+      const px = mx > -9000 ? (mx - vw / 2) * -0.01 : 0;
+      const py = my > -9000 ? (my - vh / 2) * -0.01 : 0;
+      starsEl.style.transform = `translate3d(${px.toFixed(1)}px, ${(py + sy * 0.2).toFixed(1)}px, 0)`;
+    }
+
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+</script>

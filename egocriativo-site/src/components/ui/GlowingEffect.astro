@@ -1,0 +1,180 @@
+---
+/**
+ * Borda que acende seguindo o cursor.
+ * Uso: colocar dentro de um elemento com `position: relative` e `border-radius`.
+ */
+interface Props {
+  blur?: number;
+  inactiveZone?: number;
+  proximity?: number;
+  spread?: number;
+  borderWidth?: number;
+  duration?: number;
+  class?: string;
+}
+
+const {
+  blur = 0,
+  inactiveZone = 0.01,
+  proximity = 64,
+  spread = 40,
+  borderWidth = 1.5,
+  duration = 1.6,
+  class: className,
+} = Astro.props;
+---
+
+<div
+  class:list={['glow-fx', { 'glow-fx--blur': blur > 0 }, className]}
+  data-glow
+  data-inactive-zone={inactiveZone}
+  data-proximity={proximity}
+  aria-hidden="true"
+  style={`--glow-blur:${blur}px;--glow-spread:${spread};--glow-border:${borderWidth}px;--glow-duration:${duration}s`}
+>
+</div>
+
+<style>
+  /* registrado para poder ser interpolado pela transition */
+  @property --start {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+  }
+
+  .glow-fx {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    --start: 0;
+    --active: 0;
+    --glow-rep: 5;
+    transition: --start var(--glow-duration, 1.6s) cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glow-fx--blur {
+    filter: blur(var(--glow-blur, 0px));
+  }
+
+  .glow-fx::after {
+    content: "";
+    position: absolute;
+    inset: calc(-1 * var(--glow-border, 1.5px));
+    border-radius: inherit;
+    padding: var(--glow-border, 1.5px);
+    opacity: var(--active, 0);
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+
+    /* paleta da marca: vermelho → laranja → amarelo */
+    background:
+      radial-gradient(circle, #ff4d1a 10%, #ff4d1a00 20%),
+      radial-gradient(circle at 40% 40%, #ffb25a 5%, #ffb25a00 15%),
+      radial-gradient(circle at 60% 60%, #ffd23d 10%, #ffd23d00 20%),
+      radial-gradient(circle at 40% 60%, #d9531a 10%, #d9531a00 20%),
+      repeating-conic-gradient(
+        from 236.84deg at 50% 50%,
+        #ff3d00 0%,
+        #f0742a calc(25% / var(--glow-rep)),
+        #ffd23d calc(50% / var(--glow-rep)),
+        #ff6a1a calc(75% / var(--glow-rep)),
+        #ff3d00 calc(100% / var(--glow-rep))
+      );
+    background-attachment: fixed;
+
+    /* 1) feixe cônico que segue o cursor  2) recorta o miolo, sobra só a borda */
+    -webkit-mask:
+      conic-gradient(
+          from calc((var(--start) - var(--glow-spread)) * 1deg),
+          #00000000 0deg,
+          #fff,
+          #00000000 calc(var(--glow-spread) * 2deg)
+        )
+        border-box,
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0) border-box;
+    -webkit-mask-composite: source-in, xor, source-over;
+    mask:
+      conic-gradient(
+          from calc((var(--start) - var(--glow-spread)) * 1deg),
+          #00000000 0deg,
+          #fff,
+          #00000000 calc(var(--glow-spread) * 2deg)
+        )
+        border-box,
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0) border-box;
+    mask-composite: intersect, exclude, add;
+  }
+</style>
+
+<script>
+  const nodes = document.querySelectorAll<HTMLElement>('[data-glow]');
+
+  if (nodes.length) {
+    const pointer = { x: -9999, y: -9999 };
+    let frame = 0;
+    let seenPointer = false;
+
+    const num = (value: string | undefined, fallback: number) => {
+      const n = Number.parseFloat(value ?? '');
+      return Number.isFinite(n) ? n : fallback;
+    };
+
+    const paint = () => {
+      frame = 0;
+
+      nodes.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+
+        const inactiveZone = num(el.dataset.inactiveZone, 0.01);
+        const proximity = num(el.dataset.proximity, 0);
+        const cx = rect.left + rect.width * 0.5;
+        const cy = rect.top + rect.height * 0.5;
+
+        // zona morta no centro: evita o feixe girar feito doido sob o cursor
+        const inactiveRadius = 0.5 * Math.min(rect.width, rect.height) * inactiveZone;
+        if (Math.hypot(pointer.x - cx, pointer.y - cy) < inactiveRadius) {
+          el.style.setProperty('--active', '0');
+          return;
+        }
+
+        const active =
+          pointer.x > rect.left - proximity &&
+          pointer.x < rect.right + proximity &&
+          pointer.y > rect.top - proximity &&
+          pointer.y < rect.bottom + proximity;
+
+        el.style.setProperty('--active', active ? '1' : '0');
+        if (!active) return;
+
+        const current = num(el.style.getPropertyValue('--start'), 0);
+        const target = (180 * Math.atan2(pointer.y - cy, pointer.x - cx)) / Math.PI + 90;
+        // menor caminho angular: nunca dá a volta completa ao cruzar 180°
+        const delta = ((((target - current + 180) % 360) + 360) % 360) - 180;
+
+        el.style.setProperty('--start', String(current + delta));
+      });
+    };
+
+    const schedule = () => {
+      if (!seenPointer || frame) return;
+      frame = requestAnimationFrame(paint);
+    };
+
+    document.body.addEventListener(
+      'pointermove',
+      (e) => {
+        pointer.x = e.clientX;
+        pointer.y = e.clientY;
+        seenPointer = true;
+        schedule();
+      },
+      { passive: true }
+    );
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+  }
+</script>

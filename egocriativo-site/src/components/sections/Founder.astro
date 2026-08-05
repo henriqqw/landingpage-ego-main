@@ -1,0 +1,243 @@
+---
+// Sem foto do fundador disponível, o render 3D no lugar do rosto não engana ninguém —
+// e mata o viés de unidade, que é o único mecanismo forte desta seção.
+// No lugar: uma ficha de credenciais datada + o carimbo do cadastro.
+// PONTO DE EXTENSÃO: quando houver retrato (4:5), ele assume a coluna esquerda, a ficha
+// desce para baixo da bio e o carimbo passa a sobrepor o canto inferior da foto.
+import Container from '../ui/Container.astro';
+import { founder } from '../../content/copy';
+import { reconhecimentos } from '../../content/prova';
+import { waLink } from '../../content/site';
+import Icon from '../ui/Icon.astro';
+
+const visiveis = reconhecimentos.slice(0, 6);
+const resto = reconhecimentos.slice(6);
+---
+<section id="sobre" class="secao" data-section="fundador">
+  <Container>
+    <div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
+      {/*
+        RETRATO DO FUNDADOR — slot reservado.
+        Para colocar a foto, basta trocar este bloco por:
+
+          import { Image } from 'astro:assets';
+          import retrato from '../../assets/rodney.jpg';
+          ...
+          <Image src={retrato} alt="Rodney Júnior, fundador da Ego Criativo"
+                 widths={[560, 1120]} sizes="(max-width: 1023px) 100vw, 40vw"
+                 class="retrato reveal" />
+
+        Especificação da foto: proporção 4:5, mínimo 1200×1500, enquadramento do peito
+        para cima, fundo escuro liso, luz de janela a 45°. Nada de modo retrato do celular.
+      */}
+      <div class="slot-foto glass-card glass-card--light reveal" aria-hidden="true"></div>
+
+      <!-- Coluna direita: quem é -->
+      <div>
+        <p class="reveal eyebrow mb-3 text-xs font-semibold uppercase tracking-[0.18em]">
+          Quem vai olhar o seu negócio
+        </p>
+        <h2 class="reveal nome text-[clamp(2rem,4.4vw,3rem)] leading-tight">{founder.name}</h2>
+        <p class="reveal papel mt-2 font-sans">{founder.role}</p>
+
+        <p class="reveal bio mt-6 text-lg leading-relaxed">{founder.bio}</p>
+        <p class="reveal bio mt-4 leading-relaxed">{founder.bio2}</p>
+
+        <p class="reveal bio mt-4 leading-relaxed">
+          Levou projetos brasileiros a {founder.paises}, em missões de terceiro setor.
+        </p>
+
+        <a
+          href={waLink('Olá, Rodney! Vim pelo site e queria falar sobre o diagnóstico.')}
+          class="reveal falar"
+          data-track="cta_click"
+          data-track-id="founder-whatsapp"
+        >
+          <Icon name="whatsapp" size={17} /> Falar direto com o Rodney no WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <!-- Reconhecimentos: prêmios pessoais dele, com quem concedeu e quando. -->
+    <div class="premios">
+      <h3 class="reveal premios-titulo">
+        {reconhecimentos.length} prêmios e títulos recebidos — cada um com quem concedeu e quando
+      </h3>
+
+      <div class="mural reveal">
+        {
+          visiveis.map((r) => (
+            <div class="item rule-doc">
+              <span class="ano tabnum">{r.ano}</span>
+              <span class="conteudo">
+                <span class="titulo-premio">{r.titulo}</span>
+                <span class="por mono-label">{r.por}</span>
+              </span>
+            </div>
+          ))
+        }
+      </div>
+
+      <details class="mais reveal">
+        <summary class="mono-label glass-card glass-card--light btn-mais">
+          <span class="abrir">+ ver mais</span>
+          <span class="fechar">− recolher</span>
+        </summary>
+        <div class="mural mt-4">
+          {
+            resto.map((r) => (
+              <div class="item rule-doc">
+                <span class="ano tabnum">{r.ano}</span>
+                <span class="conteudo">
+                  <span class="titulo-premio">{r.titulo}</span>
+                  <span class="por mono-label">{r.por}</span>
+                </span>
+              </div>
+            ))
+          }
+        </div>
+      </details>
+    </div>
+  </Container>
+</section>
+
+<style>
+  /* Superfície clara — a mesma do Bridge, Método, Oferta e CTA final. */
+  .secao {
+    background: linear-gradient(180deg, #f6f1ea 0%, #ece4d9 100%);
+    color: #1a120c;
+    padding-block: clamp(4rem, 10vw, 8rem);
+  }
+  .eyebrow { color: #a84a12; }
+  .nome { color: #160f0a; }
+  .papel { color: #a84a12; }
+  .bio { color: #5c4d42; }
+
+  /* Slot do retrato: uma moldura assumida, não um buraco. Quando a foto chegar,
+     ela entra exatamente neste espaço, sem mexer no resto do layout. */
+  .slot-foto {
+    aspect-ratio: 4 / 5;
+    border-radius: 1rem;
+  }
+  /* Geometria vem de .btn-mais; aqui só a cor da seção clara. */
+  .mais summary {
+    color: #3d3129;
+  }
+  /* A foto entra aqui com a mesma moldura. */
+  .retrato {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+  }
+
+  .lede {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    line-height: 1.35;
+    color: var(--color-ink);
+  }
+
+  /* Admitir a fraqueza antes de mostrar a força faz o resto do argumento
+     passar sem defesa levantada. */
+  .ressalva {
+    margin-top: 1.75rem;
+    padding: 0.875rem 1.125rem;
+    border-left: 2px solid rgba(240, 116, 42, 0.5);
+    background: rgba(255, 255, 255, 0.02);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--color-muted);
+  }
+
+  .falar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.75rem;
+    padding-bottom: 0.3rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #160f0a;
+    border-bottom: 1px solid rgba(194, 90, 21, 0.55);
+    transition: color 0.2s ease, gap 0.2s ease;
+  }
+  .falar:hover {
+    gap: 0.75rem;
+    color: #a84a12;
+  }
+
+  /* ---- Reconhecimentos ---- */
+  .premios {
+    margin-top: clamp(3.5rem, 8vw, 5.5rem);
+    padding-top: 2.5rem;
+    border-top: 1px solid rgba(26, 18, 12, 0.14);
+  }
+  .premios-titulo {
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: #5c4d42;
+  }
+  /* .rule-doc global usa filete branco: no claro precisa ser escuro. */
+  .item.rule-doc {
+    border-bottom-color: rgba(26, 18, 12, 0.14);
+  }
+  .mural {
+    display: grid;
+    gap: 0 2.5rem;
+    margin-top: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .mural {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .item {
+    display: grid;
+    grid-template-columns: 3.75rem 1fr;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.875rem 0;
+  }
+  .ano {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #a84a12;
+  }
+  .conteudo {
+    display: block;
+  }
+  .titulo-premio {
+    display: block;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: #160f0a;
+  }
+  .por {
+    display: block;
+    color: #7a6759;
+    margin-top: 0.25rem;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: 0.65625rem;
+  }
+
+  .mais {
+    margin-top: 1.5rem;
+  }
+
+  .mais summary:hover {
+    color: #a84a12;
+  }
+  .mais .fechar,
+  .mais[open] .abrir {
+    display: none;
+  }
+  .mais[open] .fechar {
+    display: inline;
+  }
+</style>

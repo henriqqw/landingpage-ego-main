@@ -1,0 +1,136 @@
+---
+// Fecho em campo de marca: laranja sólido de borda a borda. É a única seção saturada
+// da página inteira, e é o que faz o fim ser lembrado (efeito pico-fim).
+// Sobre laranja, o texto vai para quase-preto: é o par de maior contraste da paleta.
+import Container from '../ui/Container.astro';
+import Icon from '../ui/Icon.astro';
+import { waLink } from '../../content/site';
+import { consultaCnpj } from '../../content/prova';
+---
+<section class="campo" data-section="final">
+  <Container class="text-center">
+    <h2 class="reveal titulo">
+      Marketing que vira lucro começa por descobrir quanto está virando despesa.
+    </h2>
+    <p class="reveal sub">São 40 minutos e um número na tela. O resto é decisão sua.</p>
+
+    <div class="reveal botoes">
+      <a href="#contato" class="primario" data-track="cta_click" data-track-id="final-diagnostico">
+        Quero meu diagnóstico gratuito <Icon name="arrow" size={18} />
+      </a>
+      <a
+        href={waLink('Olá! Vim pelo site e quero falar sobre o diagnóstico.')}
+        class="secundario"
+        data-track="cta_click"
+        data-track-id="final-whatsapp"
+      >
+        <Icon name="whatsapp" size={18} /> Prefiro falar no WhatsApp
+      </a>
+    </div>
+
+    <p class="reveal linha-fina">
+      <span class="mono-label">EGO CRIATIVO LTDA · CNPJ 11.648.734/0001-06 · ativo desde 08/03/2010</span>
+      <a
+        class="confere mono-label"
+        href={consultaCnpj}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-track="proof_click"
+        data-track-id="final-cnpj"
+      >
+        conferir ↗
+      </a>
+    </p>
+  </Container>
+</section>
+
+<style>
+  .campo {
+    background: linear-gradient(170deg, #f0742a 0%, #d9531a 100%);
+    color: #2a1206;
+    padding-block: clamp(5rem, 12vw, 8rem);
+  }
+  .titulo {
+    max-width: 900px;
+    margin-inline: auto;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 1.08;
+    color: #1d0c03;
+  }
+  .sub {
+    max-width: 560px;
+    margin: 1.25rem auto 0;
+    font-size: 1.1875rem;
+    line-height: 1.5;
+    font-weight: 500;
+    color: #2a1206;
+  }
+  .botoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.875rem;
+    margin-top: 2.25rem;
+  }
+  /* Sobre o laranja, o primário é quase-preto: máximo contraste da página inteira. */
+  .primario {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.95rem 1.75rem;
+    border-radius: 999px;
+    background: #160b04;
+    color: #f6f1ea;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    box-shadow: 0 12px 28px -14px rgba(29, 12, 3, 0.8);
+    transition: background-color 0.2s ease, gap 0.2s ease, transform 0.2s ease;
+  }
+  .primario:hover {
+    background: #2a1206;
+    gap: 0.75rem;
+    transform: translateY(-2px);
+  }
+  .secundario {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.95rem 1.6rem;
+    border-radius: 999px;
+    background: #f6f1ea;
+    color: #1d0c03;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    box-shadow: 0 10px 24px -14px rgba(29, 12, 3, 0.6);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+  .secundario:hover {
+    background: #fff;
+    transform: translateY(-2px);
+  }
+
+  .linha-fina {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 0.875rem;
+    margin-top: 2.75rem;
+  }
+  /* 11px em monoespaçada sobre laranja é o texto mais frágil da seção:
+     precisa de cor sólida e escura para passar de 4,5:1. */
+  .linha-fina .mono-label {
+    font-size: 0.6875rem;
+    color: #2a1206;
+  }
+  .confere {
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(29, 12, 3, 0.14);
+    color: #1d0c03;
+    transition: background-color 0.2s ease;
+  }
+  .confere:hover {
+    background: rgba(29, 12, 3, 0.24);
+  }
+</style>

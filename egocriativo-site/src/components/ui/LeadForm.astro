@@ -1,0 +1,426 @@
+---
+// Formulário em 3 passos. O passo 1 não pede nada pessoal e custa um clique —
+// quem clicou já "começou", e aí o abandono passa a ter custo psicológico.
+// Nome + WhatsApp são os obrigatórios: é o canal que a PME brasileira usa.
+// Sem JS, todos os passos ficam visíveis e o form submete nativo.
+
+// As quatro têm o mesmo ritmo e ≤33 caracteres de propósito: com formatos gramaticais
+// diferentes, o visitante é obrigado a ler as quatro; iguais, ele escaneia numa passada.
+const gargalos = [
+  'Ninguém nos encontra no Google',
+  'Anunciamos sem saber o retorno',
+  'A marca não sustenta o preço',
+  'Vamos lançar um produto ou evento',
+];
+// "Prefiro não responder" por último: uma saída oferecida primeiro convida todo mundo
+// a usá-la. No fim, ela serve só a quem realmente travaria na pergunta.
+const verbas = [
+  'Até R$ 1.000',
+  'R$ 1.000 a 5.000',
+  'R$ 5.000 a 20.000',
+  'Acima de R$ 20.000',
+  'Prefiro não responder',
+];
+// Campos na superfície clara: papel branco, texto escuro, foco laranja.
+const campo = 'campo w-full rounded-xl px-4 py-3';
+---
+<form id="lead-form" class="form" method="POST" action="/api/lead" novalidate>
+  {/* O texto sai da tela, o sinal fica: três barras dizem "isso acaba" sem gastar
+      uma frase. O anúncio para leitor de tela continua idêntico. */}
+  <span class="sr-only" data-progresso aria-live="polite">Passo 1 de 3</span>
+  <div class="barras" data-barras aria-hidden="true">
+    <span class="barra ativa"></span><span class="barra"></span><span class="barra"></span>
+  </div>
+
+  <fieldset class="passo" data-passo="1">
+    <legend tabindex="-1">Qual é o seu maior gargalo?</legend>
+    <div class="opcoes">
+      {
+        gargalos.map((g) => (
+          <label class="opcao glass-card">
+            <input type="radio" name="gargalo" value={g} />
+            <span>{g}</span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+
+  <fieldset class="passo" data-passo="2">
+    <legend tabindex="-1">Quanto investe em marketing por mês?</legend>
+    <div class="opcoes">
+      {
+        verbas.map((v) => (
+          <label class="opcao glass-card">
+            <input type="radio" name="verba" value={v} />
+            <span>{v}</span>
+          </label>
+        ))
+      }
+    </div>
+    <p class="ajuda">Não existe resposta errada.</p>
+  </fieldset>
+
+  <fieldset class="passo" data-passo="3">
+    <legend tabindex="-1">Pra onde mando o diagnóstico?</legend>
+    {/* Rótulo em sr-only: o placeholder some assim que a pessoa digita e não é
+        rótulo programático. Custo visual zero, ganho de acessibilidade real. */}
+    <div class="campos">
+      <label class="sr-only" for="lead-nome">Seu nome</label>
+      <input
+        id="lead-nome"
+        name="nome"
+        required
+        placeholder="Seu nome"
+        autocomplete="name"
+        class={campo}
+      />
+
+      <label class="sr-only" for="lead-whatsapp">WhatsApp com DDD</label>
+      <input
+        id="lead-whatsapp"
+        name="whatsapp"
+        required
+        type="tel"
+        inputmode="tel"
+        placeholder="WhatsApp com DDD"
+        autocomplete="tel"
+        class={campo}
+      />
+
+      <label class="sr-only" for="lead-empresa">Empresa (opcional)</label>
+      <input
+        id="lead-empresa"
+        name="empresa"
+        placeholder="Empresa (opcional)"
+        autocomplete="organization"
+        class={campo}
+      />
+    </div>
+
+    <!-- Campo-armadilha: só robô preenche. -->
+    <input type="text" name="site_url" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true" />
+  </fieldset>
+
+  {/* Os padrões do markup são os do cenário SEM JS: o botão de envio nasce visível e
+      os de navegação nascem ocultos. Antes era o contrário, e sem JS o formulário
+      ficava sem nenhuma forma de enviar. Com JS, mostrar(0) reescreve os três. */}
+  <div class="acoes">
+    <button type="button" class="voltar" data-voltar hidden>← Voltar</button>
+    <button type="button" class="avancar" data-avancar hidden>Continuar</button>
+    <button type="submit" class="enviar" data-enviar>Quero meu diagnóstico gratuito</button>
+  </div>
+
+  <p id="lead-status" class="status" role="status" aria-live="polite" hidden></p>
+
+  <p class="rodape">Resposta em até 1 dia útil. Usamos seus dados só para isso.</p>
+</form>
+
+<style>
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  /* Três barras de 2px no lugar da frase "Passo 1 de 3". */
+  .barras {
+    display: flex;
+    gap: 0.375rem;
+  }
+  .barra {
+    flex: 1;
+    height: 2px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.12);
+    transition: background-color 0.3s ease;
+  }
+  .barra.ativa {
+    background: var(--color-orange);
+  }
+  .passo {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  /* Sem JS os três passos ficam visíveis; o script esconde os que não são o atual. */
+  .passo[hidden] {
+    display: none;
+  }
+  legend {
+    padding: 0;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.3;
+    color: var(--color-ink);
+  }
+  legend:focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 4px;
+  }
+
+  .opcoes {
+    display: grid;
+    gap: 0.625rem;
+    margin-top: 1.25rem;
+  }
+  .opcao {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.9375rem;
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: color 0.16s ease;
+  }
+  .opcao:hover {
+    color: var(--color-ink);
+  }
+  .opcao input {
+    accent-color: var(--color-orange);
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+  }
+  /* Selecionado: o mesmo material, com a luz laranja da marca. */
+  .opcao:has(input:checked) {
+    color: var(--color-ink);
+    font-weight: 600;
+    background: linear-gradient(
+      160deg,
+      rgba(240, 116, 42, 0.14) 0%,
+      rgba(240, 116, 42, 0.06) 45%,
+      rgba(240, 116, 42, 0.03) 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 200, 150, 0.22),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+      0 14px 34px -14px rgba(0, 0, 0, 0.75);
+  }
+  .opcao:has(input:checked)::before {
+    background: linear-gradient(
+      140deg,
+      rgba(255, 190, 130, 0.6) 0%,
+      rgba(240, 116, 42, 0.35) 45%,
+      rgba(255, 190, 130, 0.45) 100%
+    );
+  }
+
+  .campo {
+    background: rgba(6, 4, 3, 0.6);
+    border: 1px solid var(--color-line);
+    color: var(--color-ink);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .campo::placeholder {
+    color: var(--color-dim);
+  }
+  .campo:focus {
+    outline: none;
+    border-color: var(--color-amber);
+    background: rgba(6, 4, 3, 0.85);
+  }
+
+  .ajuda {
+    margin-top: 0.875rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--color-dim);
+  }
+  .campos {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+  .hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  .acoes {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.625rem;
+  }
+  .avancar,
+  .enviar {
+    width: 100%;
+    border-radius: 999px;
+    padding: 0.875rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    background: var(--color-orange);
+    color: #160b04;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+  }
+  .avancar:hover,
+  .enviar:hover {
+    background: var(--color-orange-600);
+  }
+  .avancar:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .voltar {
+    order: -1;
+    padding: 0 0 0.125rem;
+    font-size: 0.8125rem;
+    color: var(--color-dim);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+  }
+  .voltar:hover {
+    color: var(--color-ink);
+  }
+
+  .status {
+    padding: 0.875rem 1rem;
+    border-radius: 0.75rem;
+    background: rgba(109, 48, 17, 0.35);
+    border: 1px solid rgba(240, 116, 42, 0.3);
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-gold);
+  }
+  .status :global(a) {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-weight: 600;
+    color: var(--color-amber);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .rodape {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--color-dim);
+  }
+</style>
+
+<script>
+  import { submitLead } from '../../lib/leads';
+  import { track } from '../../lib/analytics';
+
+  const form = document.getElementById('lead-form') as HTMLFormElement | null;
+
+  if (form) {
+    const passos = Array.from(form.querySelectorAll<HTMLFieldSetElement>('[data-passo]'));
+    const progresso = form.querySelector<HTMLElement>('[data-progresso]');
+    const barras = Array.from(form.querySelectorAll<HTMLElement>('[data-barras] .barra'));
+    const btnVoltar = form.querySelector<HTMLButtonElement>('[data-voltar]');
+    const btnAvancar = form.querySelector<HTMLButtonElement>('[data-avancar]');
+    const btnEnviar = form.querySelector<HTMLButtonElement>('[data-enviar]');
+    const status = document.getElementById('lead-status');
+
+    let atual = 0;
+    let comecou = false;
+
+    // Mover o foco é necessário para leitor de tela, mas com o mouse o anel de foco
+    // aparecia em volta da pergunta como se fosse um erro. Só move quando a navegação
+    // é por teclado — quem clica já sabe onde está.
+    let viaTeclado = false;
+    form.addEventListener('keydown', () => (viaTeclado = true), true);
+    form.addEventListener('pointerdown', () => (viaTeclado = false), true);
+
+    const mostrar = (i: number, focar = viaTeclado) => {
+      atual = i;
+      passos.forEach((p, idx) => (p.hidden = idx !== i));
+      // O texto continua existindo para leitor de tela; a barra é o equivalente visual.
+      if (progresso) progresso.textContent = `Passo ${i + 1} de ${passos.length}`;
+      barras.forEach((b, idx) => b.classList.toggle('ativa', idx <= i));
+      if (btnVoltar) btnVoltar.hidden = i === 0;
+      const ultimo = i === passos.length - 1;
+      if (btnAvancar) btnAvancar.hidden = ultimo;
+      if (btnEnviar) btnEnviar.hidden = !ultimo;
+      if (focar) passos[i].querySelector<HTMLElement>('legend')?.focus();
+    };
+
+    mostrar(0, false);
+
+    // Escolher uma opção avança sozinho: o menor atrito possível nos dois primeiros passos.
+    form.addEventListener('change', (e) => {
+      const alvo = e.target as HTMLInputElement;
+      if (alvo.type !== 'radio') return;
+      if (!comecou) {
+        comecou = true;
+        track('form_start', { campo: alvo.name });
+      }
+      track('form_step', { step: atual + 1, opcao: alvo.value });
+      if (atual < passos.length - 1) setTimeout(() => mostrar(atual + 1), 250);
+    });
+
+    form.addEventListener('focusin', () => {
+      if (comecou) return;
+      comecou = true;
+      track('form_start', { campo: 'texto' });
+    });
+
+    btnAvancar?.addEventListener('click', () => mostrar(Math.min(atual + 1, passos.length - 1)));
+    btnVoltar?.addEventListener('click', () => mostrar(Math.max(atual - 1, 0)));
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const dados = Object.fromEntries(new FormData(form).entries()) as Record<string, string>;
+
+      // Validação nativa, com mensagens em português.
+      const nome = form.querySelector<HTMLInputElement>('[name="nome"]')!;
+      const zap = form.querySelector<HTMLInputElement>('[name="whatsapp"]')!;
+      nome.setCustomValidity(nome.value.trim().length < 2 ? 'Informe seu nome.' : '');
+      const digitos = zap.value.replace(/\D/g, '');
+      zap.setCustomValidity(
+        digitos.length < 10 ? 'Informe o WhatsApp com DDD, ex.: (11) 91234-5678.' : ''
+      );
+      if (!form.reportValidity()) {
+        track('form_error', { campo: nome.validity.valid ? 'whatsapp' : 'nome' });
+        return;
+      }
+
+      const rotulo = btnEnviar?.textContent ?? '';
+      if (btnEnviar) {
+        btnEnviar.disabled = true;
+        btnEnviar.textContent = 'Enviando...';
+      }
+      form.setAttribute('aria-busy', 'true');
+
+      const res = await submitLead({
+        nome: dados.nome,
+        whatsapp: dados.whatsapp,
+        empresa: dados.empresa || undefined,
+        gargalo: dados.gargalo || undefined,
+        verba: dados.verba || undefined,
+      });
+
+      if (status) {
+        status.hidden = false;
+        if (res.ok) {
+          status.textContent = 'Recebido! O Rodney responde em até 1 dia útil.';
+        } else {
+          // Backend ainda não plugado (ou fora do ar): entrega o handoff pronto.
+          status.innerHTML =
+            'Para adiantar, mande sua mensagem direto no WhatsApp — já vai preenchida com o que você respondeu.';
+          const a = document.createElement('a');
+          a.href = res.fallbackWa!;
+          a.textContent = 'Abrir WhatsApp →';
+          a.setAttribute('data-track', 'cta_click');
+          a.setAttribute('data-track-id', 'form-fallback-whatsapp');
+          status.appendChild(a);
+        }
+      }
+
+      form.removeAttribute('aria-busy');
+      if (btnEnviar) {
+        btnEnviar.disabled = false;
+        btnEnviar.textContent = rotulo;
+      }
+      if (res.ok) form.reset();
+    });
+  }
+</script>

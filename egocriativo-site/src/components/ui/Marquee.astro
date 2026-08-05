@@ -1,0 +1,112 @@
+---
+// Carrossel infinito (marquee) em CSS puro — desliza da direita p/ esquerda,
+// bordas esmaecidas, pausa no hover e volta a rodar quando o mouse sai.
+// Dois registros: 'display' (nomes em Rondalo) e 'log' (registro datado em monoespaçada).
+export interface MarqueeEntry {
+  ano?: string;
+  nome: string;
+  tema?: string;
+}
+interface Props {
+  items: (string | MarqueeEntry)[];
+  speed?: number; // segundos por volta completa
+  variant?: 'display' | 'log';
+  reverse?: boolean;
+  class?: string;
+}
+const { items, speed = 32, variant = 'display', reverse = false, class: klass = '' } = Astro.props;
+
+const norm: MarqueeEntry[] = items.map((i) => (typeof i === 'string' ? { nome: i } : i));
+const loop = [...norm, ...norm]; // 2 cópias → loop perfeito com translateX(-50%)
+---
+<div class:list={['marquee', `is-${variant}`, klass]}>
+  <ul
+    class:list={['track', { reverse }]}
+    style={`animation-duration:${speed}s`}
+  >
+    {
+      loop.map((item, i) => (
+        <li class="item" aria-hidden={i >= norm.length ? 'true' : undefined}>
+          {item.ano && <span class="ano">{item.ano}</span>}
+          <span class="nome">{item.nome}</span>
+          {item.tema && <span class="tema">{item.tema}</span>}
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .track {
+    display: flex;
+    width: max-content;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    animation-name: marquee-scroll;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  .track.reverse {
+    animation-direction: reverse;
+  }
+  .marquee:hover .track {
+    animation-play-state: paused;
+  }
+  .item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+
+  /* Registro "display": nomes de instituição em Rondalo. */
+  .is-display .item {
+    padding-right: 3.5rem;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    line-height: 1;
+    color: var(--color-muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* Registro "log": ano · veículo · tema — um registro datado é mais checável que um logo. */
+  .is-log .item {
+    padding-right: 2.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.2;
+    color: var(--color-dim);
+  }
+  .is-log .ano {
+    color: var(--color-amber);
+    font-variant-numeric: tabular-nums;
+  }
+  .is-log .nome {
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .is-log .nome::before {
+    content: "· ";
+    color: var(--color-dim);
+  }
+  .is-log .tema::before {
+    content: "· ";
+    color: var(--color-dim);
+  }
+
+  @keyframes marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+</style>

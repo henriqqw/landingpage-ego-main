@@ -1,0 +1,8 @@
+---
+// Uma palavra dividida em letras para o efeito de proximidade (não quebra no meio).
+interface Props {
+  word: string;
+}
+const { word } = Astro.props;
+---
+<span class="prox-word">{word.split('').map((c) => <span class="prox">{c}</span>)}</span>

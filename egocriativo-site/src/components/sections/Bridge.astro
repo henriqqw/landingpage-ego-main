@@ -1,0 +1,84 @@
+---
+// Superfície clara — a mesma do CTA final. As duas emolduram a metade escura da
+// página: a virada de fundo marca a passagem da dor para a evidência.
+import Container from '../ui/Container.astro';
+import Icon from '../ui/Icon.astro';
+import StatsBar from './StatsBar.astro';
+---
+<section class="secao" data-section="bridge">
+  <Container class="text-center">
+    <h2 class="reveal titulo">
+      O problema não é quanto você investe.
+      <br class="hidden sm:block" />
+      É que ninguém está medindo <span class="destaque">o que volta</span>.
+    </h2>
+    <p class="reveal sub">
+      Agência comum entrega peça. A gente entrega leitura de número — e a peça vem depois, no lugar
+      certo. Antes de desenhar qualquer coisa, a gente abre três coisas: quem é a sua persona, o que
+      os seus números dizem hoje e qual é a meta do trimestre.
+    </p>
+
+    <div class="reveal mt-9 flex justify-center">
+      <a href="#historia" class="conferir" data-track="cta_click" data-track-id="bridge-historia">
+        Antes de acreditar, veja o que já foi entregue
+        <Icon name="arrow" size={18} />
+      </a>
+    </div>
+  </Container>
+
+  <div class="mt-[clamp(3rem,7vw,5rem)]">
+    <StatsBar />
+  </div>
+</section>
+
+<style>
+  .secao {
+    background: linear-gradient(180deg, #f6f1ea 0%, #ece4d9 100%);
+    color: #1a120c;
+    padding-top: clamp(3.5rem, 8vw, 6rem);
+    padding-bottom: clamp(3rem, 6vw, 4.5rem);
+  }
+
+  .titulo {
+    max-width: 940px;
+    margin-inline: auto;
+    font-size: clamp(1.9rem, 4.4vw, 3rem);
+    line-height: 1.12;
+    color: #160f0a;
+  }
+  /* O .text-gradient da marca é dourado→laranja: some no creme.
+     Aqui o mesmo papel é feito por uma faixa mais escura, que tem contraste no claro. */
+  .destaque {
+    background: linear-gradient(90deg, #a84a12, #e0761f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .sub {
+    max-width: 660px;
+    margin: 1.5rem auto 0;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: #5c4d42;
+  }
+
+  /* Interrupção de padrão: toda landing manda "ver nossos serviços" aqui.
+     Mandar conferir é o que quem não tem lastro não consegue copiar. */
+  .conferir {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.375rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #160f0a;
+    border-bottom: 1px solid rgba(194, 90, 21, 0.55);
+    transition: color 0.2s ease, border-color 0.2s ease, gap 0.2s ease;
+  }
+  .conferir:hover {
+    gap: 0.75rem;
+    color: #a84a12;
+    border-color: #a84a12;
+  }
+</style>

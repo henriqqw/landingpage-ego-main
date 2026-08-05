@@ -1,0 +1,23 @@
+# Segredos / configs locais — NÃO versionar
+# Contém a API key do 21st MCP (header x-api-key). Nunca commitar.
+.mcp.json
+
+# Material de branding e pesquisa — fica só local.
+# EgoBranding tem 124 MB de .max (3ds Max) que inflariam o histórico do repo.
+context/EgoBranding/
+context/Contexto_Ego_Rodney/
+
+# Artefatos de ferramentas
+.playwright-mcp/
+
+# Dependências / build
+node_modules/
+dist/
+.next/
+build/
+
+# Temporários / SO
+*.tmp
+Thumbs.db
+desktop.ini
+.DS_Store

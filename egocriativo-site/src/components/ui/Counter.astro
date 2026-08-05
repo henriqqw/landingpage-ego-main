@@ -1,0 +1,37 @@
+---
+// Contador. O valor final vem do HTML (SSR): sem JS, com leitor de tela ou com o
+// IntersectionObserver falhando, o número certo já está na tela — o JS só anima.
+interface Props {
+  alvo: number;
+  prefixo?: string;
+  sufixo?: string;
+  /** Texto lido por leitor de tela no lugar da contagem. */
+  descricao: string;
+  class?: string;
+}
+const { alvo, prefixo = '', sufixo = '', descricao, class: klass = '' } = Astro.props;
+// Sem separador de milhar: ano é 2010, não 2.010.
+const final = `${prefixo}${alvo}${sufixo}`;
+---
+<span class:list={['num tabnum', klass]}>
+  <span
+    data-counter={alvo}
+    data-prefixo={prefixo}
+    data-sufixo={sufixo}
+    aria-hidden="true"
+    style={`min-width:${final.length}ch`}>{final}</span
+  >
+  <span class="sr-only">{descricao}</span>
+</span>
+
+<style>
+  .num {
+    display: inline-block;
+  }
+  /* min-width em ch + tabular-nums: sem isso, cada frame muda a largura do texto
+     e dispara reflow de layout 60×/s. Com os dois, é repaint puro. */
+  .num > [data-counter] {
+    display: inline-block;
+    text-align: left;
+  }
+</style>

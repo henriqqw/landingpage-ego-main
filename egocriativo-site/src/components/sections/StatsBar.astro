@@ -1,0 +1,109 @@
+---
+// Vive dentro do Bridge, em superfície clara: filetes escuros separando os números,
+// sem card. Introduz o numeral gigante e a monoespaçada, que não existiam abaixo do Hero.
+import Container from '../ui/Container.astro';
+import Counter from '../ui/Counter.astro';
+import { site } from '../../content/site';
+---
+<div class="faixa">
+  <Container>
+    <dl class="grade">
+      {
+        site.stats.map((s, i) => (
+          <div class="item reveal" style={`--reveal-delay:${i * 70}ms`}>
+            <dt class:list={['valor', { destaque: s.destaque }]}>
+              <Counter
+                alvo={s.alvo}
+                prefixo={s.prefixo}
+                descricao={`${s.value} ${s.label}`}
+              />
+            </dt>
+            <dd class="rotulo">
+              {s.label}
+              {s.fonteUrl && (
+                <a
+                  class="fonte mono-label"
+                  href={s.fonteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-track="proof_click"
+                  data-track-id="statsbar-cnpj"
+                >
+                  {s.fonte} ↗
+                </a>
+              )}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </Container>
+</div>
+
+<style>
+  .faixa {
+    border-top: 1px solid rgba(26, 18, 12, 0.14);
+  }
+  .grade {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0;
+    padding: 2.5rem 0 0;
+  }
+  @media (min-width: 900px) {
+    .grade {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  /* Filete separando — não card. */
+  .item {
+    padding: 0.875rem 1.25rem;
+  }
+  .item + .item {
+    border-left: 1px solid rgba(26, 18, 12, 0.14);
+  }
+  @media (max-width: 899px) {
+    .item:nth-child(odd) {
+      border-left: 0;
+    }
+    .item:nth-child(n + 3) {
+      margin-top: 1.25rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(26, 18, 12, 0.14);
+    }
+  }
+
+  .valor {
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 6vw, 4.5rem);
+    line-height: 0.9;
+    color: #160f0a;
+  }
+  /* Um destaque, não quatro: só o número conferível recebe o gradiente. */
+  .valor.destaque :global(.num) {
+    background: linear-gradient(90deg, #a84a12, #e0761f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .rotulo {
+    margin: 0.625rem 0 0;
+    max-width: 20ch;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: #5c4d42;
+  }
+  .fonte {
+    display: block;
+    margin-top: 0.5rem;
+    color: #7a6759;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+    transition: color 0.16s ease;
+  }
+  .fonte:hover {
+    color: #a84a12;
+    text-decoration-style: solid;
+  }
+</style>

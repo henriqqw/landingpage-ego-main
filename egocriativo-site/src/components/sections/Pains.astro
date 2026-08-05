@@ -1,0 +1,151 @@
+---
+import Container from '../ui/Container.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Icon from '../ui/Icon.astro';
+import PainArt from '../ui/PainArt.astro';
+import GlowingEffect from '../ui/GlowingEffect.astro';
+import { pains } from '../../content/copy';
+
+const top = pains.slice(0, 3);
+const bottom = pains.slice(3);
+---
+<section class="py-[clamp(4rem,10vw,8rem)]">
+  <Container>
+    <SectionHeading
+      eyebrow="Você reconhece?"
+      title='Se marketing virou <span class="text-gradient">gasto sem retorno</span>,<br class="hidden sm:block" /> o problema não é o investimento.'
+      subtitle="É a falta de estratégia. Veja se a sua empresa está em algum destes cenários:"
+    />
+
+    <div class="pains mt-14">
+      {/* três cards centralizados */}
+      {
+        top.map((p, i) => (
+          <article class="card glass-card card--stack reveal" style={`--reveal-delay:${i * 70}ms`}>
+            <GlowingEffect />
+            <div class="art-slot">
+              <PainArt name={p.art} />
+            </div>
+            <h3 class="title">{p.title}</h3>
+            <p class="desc">{p.desc}</p>
+          </article>
+        ))
+      }
+
+      {/* dois cards largos: texto à esquerda, painel à direita */}
+      {
+        bottom.map((p, i) => (
+          <article class="card glass-card card--split reveal" style={`--reveal-delay:${(i + 3) * 70}ms`}>
+            <GlowingEffect />
+            <div class="split-copy">
+              <span class="badge glass-card">
+                <Icon name={p.icon} size={18} />
+              </span>
+              <h3 class="title">{p.title}</h3>
+              <p class="desc">{p.desc}</p>
+            </div>
+            <div class="split-art">
+              <PainArt name={p.art} />
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </Container>
+</section>
+
+<style>
+  /* ---- Bento: 3 em cima, 2 embaixo ---- */
+  .pains {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 768px) {
+    .pains {
+      grid-template-columns: repeat(6, 1fr);
+    }
+    .card:nth-child(-n + 3) {
+      grid-column: span 2;
+    }
+    .card:nth-child(n + 4) {
+      grid-column: span 3;
+    }
+  }
+
+  /* Material de vidro vem de .glass-card (global.css). Aqui só a geometria. */
+  .card {
+    border-radius: 1rem;
+    padding: 1.75rem;
+  }
+
+  .title {
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.95);
+  }
+  .desc {
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* ---- Card empilhado (linha de cima) ---- */
+  .card--stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 2rem;
+  }
+  .card--stack .art-slot {
+    width: 100%;
+    max-width: 16rem;
+    margin-bottom: 1.75rem;
+  }
+  .card--stack .desc {
+    max-width: 34ch;
+  }
+
+  /* ---- Card dividido (linha de baixo) ---- */
+  .card--split {
+    display: grid;
+    gap: 1.5rem;
+  }
+  @media (min-width: 640px) {
+    .card--split {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      align-items: stretch;
+      gap: 1.75rem;
+    }
+  }
+  /* badge ancorado no topo, texto no rodapé — mantém os dois cards alinhados */
+  .split-copy {
+    display: flex;
+    flex-direction: column;
+  }
+  .split-copy .title {
+    margin-top: auto;
+  }
+  /* Mesmo material do card, em escala menor (vidro vem de .glass-card). */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 1.25rem;
+    border-radius: 0.875rem;
+    color: rgba(255, 255, 255, 0.72);
+  }
+  .split-art {
+    min-height: 9.5rem;
+    display: flex;
+    align-items: center;
+  }
+  .split-art > :global(*) {
+    width: 100%;
+  }
+</style>

@@ -1,0 +1,66 @@
+---
+// Ficha em superfície "papel": raio de 4px, filete fino, grão.
+// Reto = documento; arredondado = marketing. O contraste entre os dois registros é o design.
+interface Props {
+  titulo: string;
+  selo?: string;
+  class?: string;
+}
+const { titulo, selo, class: klass = '' } = Astro.props;
+---
+<article class:list={['doc ficha', klass]}>
+  <header class="cab">
+    <span class="mono-label">{titulo}</span>
+    {
+      selo && (
+        <span class="selo mono-label">
+          <span class="dot" aria-hidden="true" />
+          {selo}
+        </span>
+      )
+    }
+  </header>
+  <div class="corpo">
+    <slot />
+  </div>
+</article>
+
+<style>
+  .ficha {
+    position: relative;
+    overflow: hidden;
+  }
+  /* Grão local: dá textura de papel sem nenhuma requisição. */
+  .ficha::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.02;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23p)'/%3E%3C/svg%3E");
+  }
+  .cab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 32px;
+    padding: 0.5rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  }
+  .selo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-amber);
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-amber);
+  }
+  .corpo {
+    padding: 0.5rem 1.25rem 1.25rem;
+  }
+</style>

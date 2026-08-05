@@ -1,0 +1,22 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string; // aceita HTML (ex.: <span class="text-gradient">…</span>)
+  subtitle?: string;
+  align?: 'left' | 'center';
+  class?: string;
+}
+const { eyebrow, title, subtitle, align = 'center', class: klass = '' } = Astro.props;
+const wrap = align === 'center' ? 'mx-auto text-center' : 'text-left';
+---
+<div class={`max-w-[760px] ${wrap} ${klass}`}>
+  {
+    eyebrow && (
+      <p class="reveal mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-orange">
+        {eyebrow}
+      </p>
+    )
+  }
+  <h2 class="reveal text-[clamp(2rem,4.6vw,3.3rem)] leading-[1.08]" set:html={title}></h2>
+  {subtitle && <p class="reveal mt-5 text-lg leading-relaxed text-muted">{subtitle}</p>}
+</div>

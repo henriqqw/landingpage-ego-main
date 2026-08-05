@@ -1,0 +1,170 @@
+---
+import '../styles/global.css';
+import { site } from '../content/site';
+import { faq } from '../content/copy';
+import { reconhecimentos } from '../content/prova';
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+}
+const {
+  title = `${site.name} — ${site.tagline}`,
+  description = site.description,
+  noindex = false,
+} = Astro.props;
+
+const ogImage = new URL('/og-image.svg', site.url).href;
+
+// @graph em vez de nós soltos: permite referência cruzada por @id e evita duplicar entidade.
+// LocalBusiness fica de fora de propósito — as fontes divergem sobre o endereço, e
+// endereço errado no schema é pior que endereço ausente.
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': ['Organization', 'ProfessionalService'],
+      '@id': `${site.url}/#organization`,
+      name: site.legalName,
+      alternateName: site.name,
+      url: site.url,
+      logo: `${site.url}/logos/logo.svg`,
+      image: ogImage,
+      description: site.description,
+      telephone: site.contact.phone,
+      email: site.contact.email,
+      foundingDate: '2010-03-08',
+      identifier: { '@type': 'PropertyValue', name: 'CNPJ', value: site.cnpj },
+      areaServed: { '@type': 'Country', name: 'Brasil' },
+      knowsAbout: [
+        'Marketing de performance',
+        'SEO',
+        'Branding',
+        'Inteligência de dados',
+        'Eventos corporativos',
+      ],
+      founder: { '@id': `${site.url}/#rodney` },
+      sameAs: [site.social.linkedin, site.social.instagram].filter(Boolean),
+    },
+    {
+      '@type': 'Person',
+      '@id': `${site.url}/#rodney`,
+      name: 'Rodney Júnior',
+      jobTitle: 'Fundador e consultor de marketing',
+      worksFor: { '@id': `${site.url}/#organization` },
+      alumniOf: [
+        { '@type': 'CollegeOrUniversity', name: 'Universidade Federal de Mato Grosso do Sul' },
+        { '@type': 'CollegeOrUniversity', name: 'FATEC SENAI' },
+        { '@type': 'CollegeOrUniversity', name: 'Unicesumar' },
+      ],
+      award: reconhecimentos.slice(0, 8).map((r) => `${r.titulo} — ${r.por} (${r.ano})`),
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${site.url}/#faq`,
+      mainEntity: faq.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${site.url}/#website`,
+      url: site.url,
+      name: site.name,
+      inLanguage: 'pt-BR',
+      publisher: { '@id': `${site.url}/#organization` },
+    },
+  ],
+};
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/logos/icone.png" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="canonical" href={site.url} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={site.url} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${site.name} — ${site.tagline}`} />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content={site.name} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+    {
+      site.analytics.umamiSrc && site.analytics.umamiWebsiteId && (
+        <script
+          defer
+          src={site.analytics.umamiSrc}
+          data-website-id={site.analytics.umamiWebsiteId}
+        />
+      )
+    }
+  </head>
+  <body>
+    <slot />
+
+    <script>
+      import Lenis from 'lenis';
+
+      // Smooth scroll global (dá o "manteiga" no scroll parallax)
+      const lenis = new Lenis();
+      function raf(time: number) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
+      requestAnimationFrame(raf);
+
+      // Âncoras (#servicos, #contato…) com rolagem suave via Lenis
+      document.querySelectorAll('a[href^="#"]').forEach((a) => {
+        a.addEventListener('click', (e) => {
+          const href = a.getAttribute('href');
+          if (!href || href.length < 2) return;
+          if (document.querySelector(href)) {
+            e.preventDefault();
+            lenis.scrollTo(href, { offset: -16 });
+          }
+        });
+      });
+
+      // Instrumentação declarativa (data-track) e contadores — um observer cada.
+      import '../scripts/track';
+      import '../scripts/counters';
+
+      const els = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add('in');
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+        );
+        els.forEach((el) => io.observe(el));
+      } else {
+        els.forEach((el) => el.classList.add('in'));
+      }
+    </script>
+  </body>
+</html>

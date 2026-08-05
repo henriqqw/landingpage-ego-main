@@ -1,0 +1,225 @@
+---
+// Duas colunas com funções distintas: esquerda argumenta, direita age.
+// Os contatos alternativos moram na coluna do formulário — é lá que a pessoa decide
+// como falar com a gente, e é o que equilibra a altura das duas colunas.
+import Container from '../ui/Container.astro';
+import Icon from '../ui/Icon.astro';
+import LeadForm from '../ui/LeadForm.astro';
+import { site, waLink } from '../../content/site';
+
+// O href do telefone é derivado do mesmo dado que o texto: hardcoded, ele ficaria
+// desatualizado no dia em que o número mudasse em site.ts.
+const telHref = `tel:+55${site.contact.phone.replace(/\D/g, '')}`;
+
+// Quem chega aqui já clicou num botão que dizia "diagnóstico gratuito" — a seção não
+// precisa vender de novo, precisa tirar o último medo e sair da frente.
+const benefits = [
+  'Onde sua marca está hoje: Google, redes e a cabeça de quem compra.',
+  'As 3 oportunidades de maior retorno com menor esforço.',
+  'O que fazer nos próximos 30 dias.',
+];
+---
+<section id="contato" class="secao" data-section="oferta">
+  <Container>
+    <div class="painel glass-card">
+      <!-- Coluna do argumento -->
+      <div class="argumento">
+        <p class="reveal eyebrow mono-label">Diagnóstico gratuito · 40 minutos</p>
+
+        {/* "40 minutos" fica só no eyebrow: aparecia três vezes na mesma tela. */}
+        <h2 class="reveal titulo">
+          <span class="linha">Você sai sabendo onde está o furo.</span>
+          <span class="linha destaque">Mesmo que não trabalhe com a gente.</span>
+        </h2>
+
+        <p class="reveal sub">
+          Conversa com o Rodney, olhando os seus números. Não é apresentação de 30 slides.
+        </p>
+
+        <ul class="reveal beneficios">
+          {
+            benefits.map((t) => (
+              <li>
+                <span class="tick">
+                  <Icon name="check" size={13} />
+                </span>
+                {t}
+              </li>
+            ))
+          }
+        </ul>
+
+        {/* Uma linha, não uma caixa: é nota de rodapé da oferta, não um terceiro
+            argumento. "Cartão" e "contrato" saíram — ninguém teme cobrança numa
+            conversa gratuita, e citar cartão planta a ideia de pagamento. */}
+        <p class="reveal risco">Sem proposta e sem insistência. Se não valer, a gente encerra.</p>
+      </div>
+
+      <!-- Coluna da ação -->
+      <div class="acao">
+        <div class="reveal form-col glass-card">
+          <LeadForm />
+        </div>
+
+        {/* Não deletar: o botão flutuante de WhatsApp se esconde quando #contato entra
+            na tela, então aqui esta caixa é o único caminho de WhatsApp que existe. */}
+        <div class="reveal atalhos glass-card">
+          <p class="atalhos-label mono-label">Prefere falar agora?</p>
+          <div class="linha-atalhos">
+            <a
+              href={waLink('Olá! Vim pelo site e quero o diagnóstico gratuito.')}
+              class="atalho"
+              data-track="cta_click"
+              data-track-id="oferta-whatsapp"
+            >
+              <Icon name="whatsapp" size={17} />
+              <span>WhatsApp</span>
+              <span class="seta" aria-hidden="true">↗</span>
+            </a>
+            <a href={telHref} class="atalho">
+              <Icon name="phone" size={17} />
+              <span>{site.contact.phone}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>
+
+<style>
+  .secao {
+    padding-block: clamp(4rem, 10vw, 8rem);
+  }
+
+  .painel {
+    display: grid;
+    gap: 2.5rem;
+    padding: 1.75rem;
+    border-radius: 1.5rem;
+  }
+  @media (min-width: 900px) {
+    .painel {
+      grid-template-columns: 0.92fr 1fr;
+      /* Centrado, não no topo: sem isso a coluna curta deixa um vazio inteiro embaixo. */
+      align-items: center;
+      gap: 3.5rem;
+      padding: 3rem;
+    }
+  }
+
+  /* ---- Coluna do argumento ---- */
+  .eyebrow {
+    color: var(--color-orange);
+  }
+  .titulo {
+    margin-top: 1rem;
+    font-size: clamp(2rem, 4.4vw, 3.05rem);
+    line-height: 1.1;
+    color: var(--color-ink);
+  }
+  /* Duas frases, duas linhas — a segunda é a virada, precisa respirar sozinha. */
+  .linha {
+    display: block;
+  }
+  .linha + .linha {
+    margin-top: 0.35rem;
+  }
+  .destaque {
+    background: linear-gradient(90deg, var(--color-gold), var(--color-orange));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .sub {
+    margin-top: 1rem;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  .beneficios {
+    list-style: none;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+  .beneficios li {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: start;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: rgba(246, 241, 234, 0.9);
+  }
+  .tick {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.1rem;
+    border-radius: 999px;
+    background: rgba(109, 48, 17, 0.45);
+    color: var(--color-amber);
+  }
+
+  /* Hierarquia: rótulo em mono, texto menor e mais claro. É nota de rodapé da oferta,
+     não um terceiro argumento competindo com os bullets. */
+  .risco {
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-dim);
+  }
+
+  /* ---- Coluna da ação ---- */
+  .acao {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .form-col {
+    padding: 1.5rem;
+    border-radius: 1rem;
+  }
+  @media (min-width: 768px) {
+    .form-col {
+      padding: 1.75rem;
+    }
+  }
+
+  .atalhos {
+    display: grid;
+    gap: 0.625rem;
+    padding: 0.875rem 1.25rem;
+    border-radius: var(--radius-doc);
+  }
+  .linha-atalhos {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+  }
+  .atalhos-label {
+    margin-bottom: 0.25rem;
+  }
+  .atalho {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.9375rem;
+    color: var(--color-muted);
+    transition: color 0.2s ease;
+  }
+  .atalho:hover {
+    color: var(--color-ink);
+  }
+  .seta {
+    font-size: 0.75rem;
+    color: var(--color-dim);
+  }
+</style>

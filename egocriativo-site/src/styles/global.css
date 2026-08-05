@@ -1,0 +1,450 @@
+@import "tailwindcss";
+@import "@fontsource-variable/hanken-grotesk";
+
+/* ---- Fontes da marca (self-hosted) ---- */
+@font-face {
+  font-family: "Rondalo";
+  src: url("/fonts/RondaloRegular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Moonbeam";
+  src: url("/fonts/MoonbeamRegular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* ---- Design tokens (Tailwind v4 @theme) ---- */
+@theme {
+  --color-bg: #060403;
+  --color-bg-2: #0c0806;
+  --color-surface: #14100d;
+  --color-surface-2: #1c1712;
+  --color-line: rgba(255, 255, 255, 0.1);
+  --color-brand: #6d3011;
+  --color-brand-600: #7c3a16;
+  --color-orange: #f0742a;
+  --color-orange-600: #d9531a;
+  --color-amber: #ffb25a;
+  --color-gold: #ffd9a0;
+  --color-ink: #f6f1ea;
+  --color-muted: #b3aaa1;
+  --color-dim: #9a9089;
+
+  /* Registro documental: superfícies e raio "de papel" (reto = documento). */
+  --color-paper: #0a0705;
+  --color-well: #040302;
+  --radius-doc: 4px;
+
+  --font-display: "Rondalo", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Hanken Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-logo: "Moonbeam", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+
+/* ---- Base ---- */
+:root {
+  color-scheme: dark;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+}
+::selection {
+  background: var(--color-orange);
+  color: #160b04;
+}
+:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+/* Conteúdo de <details> fechado precisa sumir de fato: quando o filho declara o
+   próprio display (ex.: display:grid), a regra do autor vence a do user-agent e o
+   bloco continua visível com o acordeão fechado. */
+details:not([open]) > *:not(summary) {
+  display: none !important;
+}
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Grão global: tira o aspecto de "CSS chapado" que todo tema escuro tem.
+   ~400 bytes, uma camada composta, sem custo de rolagem. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---- Lenis (smooth scroll) ---- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ---- Utilidades da marca ---- */
+.glass {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-line);
+  backdrop-filter: blur(10px);
+}
+.text-gradient {
+  background: linear-gradient(90deg, var(--color-gold), var(--color-orange));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Botão "ver mais" dos acordeões. Só geometria e tipografia — o material vem de
+   .glass-card, e a cor de cada seção (o mesmo botão vive no escuro e no claro). */
+.btn-mais {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.875rem 1.75rem;
+  border-radius: var(--radius-doc);
+  font-size: 0.8125rem;
+  letter-spacing: 0.12em;
+  transition: color 0.2s ease;
+}
+
+/* ---- Material de vidro ----
+   Três camadas fazem o material: preenchimento translúcido com desfoque do que está
+   atrás, realce interno na aresta de cima (a luz que entra) e um anel de borda em
+   gradiente, mais claro no canto superior-esquerdo — como vidro real, que só brilha
+   onde a luz bate. Use .glass-card--warm nos elementos de acento laranja. */
+.glass-card {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid transparent;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.055) 0%,
+    rgba(255, 255, 255, 0.022) 42%,
+    rgba(255, 255, 255, 0.012) 100%
+  );
+  backdrop-filter: blur(16px) saturate(135%);
+  -webkit-backdrop-filter: blur(16px) saturate(135%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 14px 34px -14px rgba(0, 0, 0, 0.75);
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* O anel: gradiente recortado por máscara, sobrando só a moldura de 1px. */
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.12) 26%,
+    rgba(255, 255, 255, 0.04) 52%,
+    rgba(255, 255, 255, 0.08) 78%,
+    rgba(255, 255, 255, 0.18) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.glass-card:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 20px 44px -16px rgba(0, 0, 0, 0.8);
+}
+
+/* Variante quente: mesmo material, luz laranja da marca. */
+.glass-card--warm {
+  background: linear-gradient(
+    160deg,
+    rgba(240, 116, 42, 0.14) 0%,
+    rgba(240, 116, 42, 0.06) 45%,
+    rgba(240, 116, 42, 0.03) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 150, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 14px 34px -14px rgba(0, 0, 0, 0.75);
+}
+.glass-card--warm::before {
+  background: linear-gradient(
+    140deg,
+    rgba(255, 190, 130, 0.75) 0%,
+    rgba(240, 116, 42, 0.32) 28%,
+    rgba(240, 116, 42, 0.14) 55%,
+    rgba(240, 116, 42, 0.26) 80%,
+    rgba(255, 190, 130, 0.5) 100%
+  );
+}
+.glass-card--warm:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 150, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 20px 44px -16px rgba(0, 0, 0, 0.8);
+}
+
+/* Vidro sobre superfície clara: a lógica se inverte — o realce vira branco e o
+   anel escurece, porque no claro é a sombra que define a aresta, não a luz. */
+.glass-card--light {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.72) 0%,
+    rgba(255, 255, 255, 0.4) 45%,
+    rgba(255, 255, 255, 0.22) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(26, 18, 12, 0.05),
+    0 14px 30px -24px rgba(26, 18, 12, 0.35);
+}
+/* Hairline uniforme: no claro, um anel que vai de branco a escuro desaparece em
+   metade do perímetro e parece defeito. Quem faz o brilho da aresta de cima é o
+   realce interno (box-shadow), não o anel. */
+.glass-card--light::before {
+  background: linear-gradient(
+    140deg,
+    rgba(26, 18, 12, 0.1) 0%,
+    rgba(26, 18, 12, 0.16) 45%,
+    rgba(26, 18, 12, 0.12) 100%
+  );
+}
+.glass-card--light:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(26, 18, 12, 0.05),
+    0 20px 40px -26px rgba(26, 18, 12, 0.45);
+}
+
+/* Acento quente no claro. */
+.glass-card--light.is-warm {
+  background: linear-gradient(
+    160deg,
+    rgba(194, 90, 21, 0.16) 0%,
+    rgba(194, 90, 21, 0.08) 45%,
+    rgba(194, 90, 21, 0.04) 100%
+  );
+}
+.glass-card--light.is-warm::before {
+  background: linear-gradient(
+    140deg,
+    rgba(194, 90, 21, 0.4) 0%,
+    rgba(194, 90, 21, 0.55) 45%,
+    rgba(194, 90, 21, 0.42) 100%
+  );
+}
+
+/* ---- Registro documental ----
+   O contraste entre os dois registros é o design: arredondado = marketing, reto = documento. */
+.doc {
+  background: var(--color-paper);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: var(--radius-doc);
+}
+/* Rótulo/legenda em monoespaçada — o registro "gerado por máquina". */
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--color-dim);
+}
+.tabnum {
+  font-variant-numeric: tabular-nums;
+}
+/* Filete tracejado = papel; sólido = interface. */
+.rule-doc {
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.09);
+}
+/* Faixa full-bleed dentro de um container centrado (poço e campo de marca). */
+.bleed {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+}
+.well {
+  background: var(--color-well);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Destaque vertical: laranja vibrante em cima → branco embaixo (ex.: "lucro." no hero). */
+.highlight {
+  background: linear-gradient(180deg, #ff6e12 0%, #ffa63f 42%, #ffffff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-style: italic;
+}
+
+/* ---- Efeito de proximidade no título (por letra) ---- */
+.prox-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.prox {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* ---- Cursor do efeito de digitação (typewriter) ---- */
+.type-cursor {
+  display: inline-block;
+  margin-left: 0.06em;
+  color: var(--color-amber);
+  font-weight: 300;
+  animation: type-blink 0.9s step-end infinite;
+}
+@keyframes type-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---- Starfield minimal (estrelas via box-shadow) ---- */
+.stars {
+  will-change: transform;
+}
+.star-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2000px;
+  animation: star-rise linear infinite;
+}
+.star-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  background: transparent;
+}
+.star-dot--2 {
+  top: 2000px;
+}
+@keyframes star-rise {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-2000px);
+  }
+}
+
+/* ---- Reveal on scroll ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(6px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out, filter 0.5s ease-out;
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform, filter;
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* ---- Borda "liquid metal": anel metálico monocromático em rotação ---- */
+@property --lm-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.liquid-border {
+  position: relative;
+  isolation: isolate;
+}
+.liquid-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: var(--lm-width, 1.5px);
+  background: conic-gradient(
+    from var(--lm-angle),
+    rgba(255, 255, 255, 0.05) 0deg,
+    rgba(255, 255, 255, 0.85) 34deg,
+    rgba(255, 255, 255, 0.08) 76deg,
+    rgba(255, 255, 255, 0.5) 118deg,
+    rgba(255, 255, 255, 0.04) 166deg,
+    rgba(255, 255, 255, 1) 212deg,
+    rgba(255, 255, 255, 0.1) 256deg,
+    rgba(255, 255, 255, 0.62) 304deg,
+    rgba(255, 255, 255, 0.05) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: lm-spin var(--lm-speed, 6s) linear infinite;
+}
+.liquid-border:hover::before {
+  animation-duration: calc(var(--lm-speed, 6s) / 2.4);
+}
+@keyframes lm-spin {
+  to {
+    --lm-angle: 360deg;
+  }
+}
+
+/* Nota: reduced-motion NÃO é respeitado (a pedido) — as animações rodam sempre,
+   em todos os dispositivos, independente da configuração do sistema. */
