@@ -3,7 +3,7 @@
 Landing page institucional da **Ego Criativo**, agência de publicidade, tecnologia e eventos.
 Site estático em **Astro + Tailwind v4**, com deploy contínuo na Vercel
 
-> Site de produção: [egocriativo.com.br](https://egocriativo.com.br)
+(https://egocriativo.vercel.app)
 
 ## Stack
 
